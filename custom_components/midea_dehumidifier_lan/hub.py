@@ -1,4 +1,5 @@
-"""The custom component for local network access to Midea appliances"""
+"""The custom component for local network access to Midea appliances
+"""
 
 from __future__ import annotations
 
@@ -36,6 +37,7 @@ from custom_components.midea_dehumidifier_lan.const import (
     DISCOVERY_IGNORE,
     DISCOVERY_LAN,
     DISCOVERY_WAIT,
+    NAME,
     UNKNOWN_IP,
 )
 from custom_components.midea_dehumidifier_lan.util import (
@@ -151,10 +153,7 @@ class Hub(AbstractHub):  # pylint: disable=too-many-instance-attributes
             if not self.coordinators:
                 raise ConfigEntryNotReady(str(self.errors))
             for unique_id, error in self.errors.items():
-                _LOGGER.warning(
-                    "Device may be offline or unreachable, trying again later. %s",
-                    error,
-                )
+                _LOGGER.warning("Device may be offline or unreachable, trying again later. %s", error)
 
     async def _process_appliance(
         self, device: dict[str, Any]
@@ -219,12 +218,13 @@ class Hub(AbstractHub):  # pylint: disable=too-many-instance-attributes
             )
 
         except Exception as ex:  # pylint: disable=broad-except
-            self.errors[device[CONF_UNIQUE_ID]] = (
-                f"Unable to get state of device {device[CONF_NAME]}: {ex}"
-            )
+            self.errors[
+                device[CONF_UNIQUE_ID]
+            ] = f"Unable to get state of device {device[CONF_NAME]}: {ex}"
             if initial_discovery:
                 _LOGGER.error(
-                    "Error '%s' while setting up appliance %s, full configuration %s",
+                    "Error '%s' while setting up appliance %s,"
+                    " full configuration %s",
                     ex,
                     device.get(CONF_UNIQUE_ID),
                     RedactedConf(self.config),
